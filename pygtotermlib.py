@@ -14,10 +14,13 @@ import pygame
 #"surface" should be a pygame surface already at the desired resolution in lines and columns.
 
 #the basic bwaa(surface) and colaa(surface) have an optional shade-interoplation option:
-#bwaa(surface, shadinterpol=1)
+#bwaa(surface, shadinterpol=1) 
+#bwaa(surface) and colaa(surface) have a shade-interpolation polarity "shadpolar" attribute (default 0). for video,
+# you may want to alternate this flag between 1 and 0
 
 #in addition, colaa(surface) has a separate interpolation option for color:
-#colaa(surface, shadinterpol=1, colorinterpol=1)
+#colaa(surface, shadinterpol=1, colorinterpol=1) 
+#a separate color interplation polarity attribute, "colorpolar", is also available in colaa(surface)
 
 #if you want a staggered interpolation, ensure "columns" (surface width) is even.
 #likewise, for striped interpolation, ensure the width is odd.
@@ -42,14 +45,17 @@ import pygame
 #        it only uses 2 escape sequences to ensure the terminal has a black background and white text for best appearance.
 
 #requires unicode & curser-position-escape-sequence capable terminal.
-def bwaa(surface, shadinterpol=0 ,colorindex=1, borderlevel1=51, borderlevel2=102, borderlevel3=153, borderlevel4=204):
+def bwaa(surface, shadinterpol=0, shadpolar=0, colorindex=1, borderlevel1=51, borderlevel2=102, borderlevel3=153, borderlevel4=204):
 	height=surface.get_height()
 	defwidth=surface.get_width()
 	DEF=('\033[0;40m\033[1;37m')
 	strblock=DEF
 	shadbias=0
 	if shadinterpol:
-		shadbias=20
+		if shadpolar:
+			shadbias=20
+		else:
+			shadbias=-20
 	#strblock=""
 	for ypos in xrange(0, height-1):
 		for xpos in xrange(0, defwidth-1):
@@ -176,18 +182,24 @@ def colpick(color, colorbias):
 		return ('\033[0;40m\033[0;32m')
 	#return ('\033[0;40m\033[1;37m')
 #requires basic color escape sequence support in terminal.
-def colaa(surface, shadinterpol=0, colorinterpol=0, colorindex=1, borderlevel1=51, borderlevel2=102, borderlevel3=153, borderlevel4=204):
+def colaa(surface, shadinterpol=0, colorinterpol=0, shadpolar=0, colorpolar=0, colorindex=1, borderlevel1=51, borderlevel2=102, borderlevel3=153, borderlevel4=204):
 	height=surface.get_height()
 	defwidth=surface.get_width()
 	DEF=('\033[0;40m\033[1;37m')
 	strblock=DEF
 	if colorinterpol:
-		colorbias=0
+		if colorpolar:
+			colorbias=0
+		else:
+			colorbias=1
 	else:
 		colorbias=2
 	shadbias=0
 	if shadinterpol:
-		shadbias=20
+		if shadpolar:
+			shadbias=20
+		else:
+			shadbias=-20
 	for ypos in xrange(0, height-1):
 		for xpos in xrange(0, defwidth-1):
 			if colorinterpol:
